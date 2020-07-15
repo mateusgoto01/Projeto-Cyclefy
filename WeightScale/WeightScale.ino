@@ -9,11 +9,11 @@
 HX711 scale1;
 HX711 scale2; 
 
-#define CBT1 // coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
+#define CBT1 2918367 // coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
 #define CBT2 // coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
 //variaveis que irão armazenar os valores das celulas de carga
-float KG1 = 0 
-float KG2 = 0
+float KG1 = 0; 
+float KG2 = 0;
 float total = 0;
 
 void setup() {
