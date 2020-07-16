@@ -1,4 +1,4 @@
-#include <HX711.h> //inclui a biblioteca do HX711
+#include <HX711.h> //inclui a biblioteca do HX711 do Bogdan
 
 //Definindo os pinos para cada modulo HX711
 #define HX711_SCK1 8
@@ -9,8 +9,8 @@
 HX711 scale1;
 HX711 scale2; 
 
-#define CBT1 2918367.0f // coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
-#define CBT2 // coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
+#define CBT1 0.0f // coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
+#define CBT2 0.0f// coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
 //variaveis que irão armazenar os valores das celulas de carga
 float KG1 = 0; 
 float KG2 = 0;
