@@ -51,7 +51,7 @@ void Multisonic::AvaregeDistance() {
     delayMicroseconds(10);
     digitalWrite(pin1, LOW);
     pulse1 = pulseIn(pin2, HIGH); // capita o tempo de nivel alto do echo
-    dist1 = pulse1/58.82; // Formula de velocidade média do som para achar a distância em cm
+    dist1 = pulse1/58.82; // Formula para achar a distância em cm de acordo com o Datasheet do sensor
     // Repete o processo acima para o segundo sensor
     digitalWrite(pin3, HIGH);
     delayMicroseconds(10);
@@ -72,10 +72,14 @@ void Multisonic::AvaregeDistance() {
     dist4 = pulse4/58.82;
 
     Avarege = (dist1 + dist2 + dist3 + dist4)/4; // realiza a média aritimética das distâncias em cm
-    Serial.print('Primeiro sensor: '); Serial.print(dist1); // Printa os valores individuais de cada sensor, lembrando que é em cm
-    Serial.print('Segundo sensor: '); Serial.print(dist2);
-    Serial.print('Terceiro sensor: '); Serial.print(dist3);
-    Serial.print('Quarto sensor: '); Serial.print(dist4);
+    Serial.print('Primeiro sensor: ');  // Printa os valores individuais de cada sensor, lembrando que é em cm
+    Serial.print(dist1);
+    Serial.print('Segundo sensor: ');
+    Serial.print(dist2);
+    Serial.print('Terceiro sensor: ');
+    Serial.print(dist3);
+    Serial.print('Quarto sensor: ');
+    Serial.print(dist4);
     Serial.println(Avarege); // Mostra no serial monitor a média aritimética das distâncias em cm
     
 }
