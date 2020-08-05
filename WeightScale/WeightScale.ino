@@ -1,56 +1,93 @@
-#include <HX711.h> //inclui a biblioteca do HX711 do Bogdan
+#include <HX711_ADC.h>
+#include <EEPROM.h>
 
-//Definindo os pinos para cada modulo HX711
-#define HX711_SCK1 8
-#define HX711_DT1 9
-#define HX711_SCK2 10  
-#define HX711_DT2 11
-//Definindo como se estivesse duas balanças
-HX711 scale1;
-HX711 scale2; 
+//pins:
+const int HX711_dout_1 = 8; //mcu > HX711 no 1 dout pin
+const int HX711_sck_1 = 9; //mcu > HX711 no 1 sck pin
+const int HX711_dout_2 = 10; //mcu > HX711 no 2 dout pin
+const int HX711_sck_2 = 11; //mcu > HX711 no 2 sck pin
 
-#define CBT1 0.0f // coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
-#define CBT2 0.0f// coloque aqui o valor encontrado / pelo peso do objeto que usou(em KG)
-//variaveis que irão armazenar os valores das celulas de carga
-float KG1 = 0; 
-float KG2 = 0;
-float total = 0;
+//HX711 constructor (dout pin, sck pin)
+HX711_ADC LoadCell_1(HX711_dout_1, HX711_sck_1); //HX711 1
+HX711_ADC LoadCell_2(HX711_dout_2, HX711_sck_2); //HX711 2
+
+const int calVal_eepromAdress_1 = 0; // eeprom adress for calibration value load cell 1 (4 bytes)
+const int calVal_eepromAdress_2 = 4; // eeprom adress for calibration value load cell 2 (4 bytes)
+long t;
 
 void setup() {
-    Serial.begin(9600);
-    scale1.begin(HX711_DT1, HX711_SCK1); // configurando os pin para as duas balanças
-    scale2.begin(HX711_DT2, HX711_SCK2);
+  Serial.begin(57600); delay(10);
+  Serial.println();
+  Serial.println("Starting...");
 
-    scale1.set_scale(CBT1); // seta a calibragem para o primeiro HX711
-    scale2.set_scale(CBT2); // seta a calibragem para o primeiro HX711
+  float calibrationValue_1; // calibration value load cell 1
+  float calibrationValue_2; // calibration value load cell 2
 
-    scale1.tare(); // Desconsiderando a massa da estrutura
-    scale2.tare();
+  calibrationValue_1 = 22542.00; 
+  calibrationValue_2 = 23650.00; 
 
-    Serial.println("Tara feita!"); // A tara está no void setup, então ao iniciar o arduino já deixe encima a estrutura
-
+  LoadCell_1.begin();
+  LoadCell_2.begin();
+  long stabilizingtime = 2000; // tare preciscion can be improved by adding a few seconds of stabilizing time
+  boolean _tare = true; //set this to false if you don't want tare to be performed in the next step
+  byte loadcell_1_rdy = 0;
+  byte loadcell_2_rdy = 0;
+  while ((loadcell_1_rdy + loadcell_2_rdy) < 2) { //run startup, stabilization and tare, both modules simultaniously
+    if (!loadcell_1_rdy) loadcell_1_rdy = LoadCell_1.startMultiple(stabilizingtime, _tare);
+    if (!loadcell_2_rdy) loadcell_2_rdy = LoadCell_2.startMultiple(stabilizingtime, _tare);
+  }
+  if (LoadCell_1.getTareTimeoutFlag()) {
+    Serial.println("Timeout, check MCU>HX711 no.1 wiring and pin designations");
+  }
+  if (LoadCell_2.getTareTimeoutFlag()) {
+    Serial.println("Timeout, check MCU>HX711 no.2 wiring and pin designations");
+  }
+  LoadCell_1.setCalFactor(calibrationValue_1); // user set calibration value (float)
+  LoadCell_2.setCalFactor(calibrationValue_2); // user set calibration value (float)
+  Serial.println("Startup is complete");
 }
 
 void loop() {
+  static boolean newDataReady = 0;
+  const int serialPrintInterval = 0; //increase value to slow down serial print activity
 
-    scale1.power_up(); // liga as celulas de carga
-    scale2.power_up();
+  // check for new data/start next conversion:
+  if (LoadCell_1.update()) newDataReady = true;
+  LoadCell_2.update();
 
-    KG1 = scale1.get_units(5); // faz uma média de 5 das pesagem achadas de cada HX711
-    KG2 = scale2.get_units(5);
+  //get smoothed value from data set
+  if ((newDataReady)) {
+    if (millis() > t + serialPrintInterval) {
+      float a = LoadCell_1.getData();
+      float b = LoadCell_2.getData();
+      float c = a + b; // soma os pessoas de cada HX711
+      Serial.print("Load_cell 1 output val: ");
+      Serial.print(a);
+      Serial.print("    Load_cell 2 output val: ");
+      Serial.println(b);
+      Serial.print("    The total weight is: ");
+      Serial.println(c);
+      newDataReady = 0;
+      t = millis();
+    }
+  }
 
-    total = KG1 + KG2; // soma os pesos das duas balanças
+  // receive command from serial terminal, send 't' to initiate tare operation:
+  if (Serial.available() > 0) {
+    float i;
+    char inByte = Serial.read();
+    if (inByte == 't') {
+      LoadCell_1.tareNoDelay();
+      LoadCell_2.tareNoDelay();
+    }
+  }
 
-    Serial.print("Balança 1: "); // mostra os valores achados por cada balança
-    Serial.print(KG1, 1);
-    Serial.print("Balança 2: ");
-    Serial.println(KG2,1);
-    Serial.print("O peso total é: "); // mostra o peso total
-    Serial.println(total, 1);
-
-    scale1.power_down(); // desliga as celulas de carga
-    scale2.power_down();
-
-    delay(1000);
+  //check if last tare operation is complete
+  if (LoadCell_1.getTareStatus() == true) {
+    Serial.println("Tare load cell 1 complete");
+  }
+  if (LoadCell_2.getTareStatus() == true) {
+    Serial.println("Tare load cell 2 complete");
+  }
 
 }
