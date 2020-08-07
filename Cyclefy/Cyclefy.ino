@@ -1,4 +1,4 @@
-#include <MHX711_ADC.h>
+#include <HX711_ADC.h>
 #include <NewPing.h>
 #include <LoRa.h>
 
@@ -43,10 +43,10 @@ void setup() {
     float calibrationValue_3; // variavel float para armazenar o valor de calibração do HX711 3
     float calibrationValue_4; // variavel float para armazenar o valor de calibração do HX711 4
 
-    calibrationValue_1 =; //Valores de calibragem para o HX711 1
-    calibrationValue_2 =; //Valores de calibragem para o HX711 2
-    calibrationValue_3 =; //Valores de calibragem para o HX711 3
-    calibrationValue_4 =; //Valores de calibragem para o HX711 4
+    calibrationValue_1 = 0.0; //Valores de calibragem para o HX711 1
+    calibrationValue_2 = 0.0; //Valores de calibragem para o HX711 2
+    calibrationValue_3 = 0.0; //Valores de calibragem para o HX711 3
+    calibrationValue_4 = 0.0; //Valores de calibragem para o HX711 4
 
     LoadCell_1.begin(); // inicia todos os HX711
     LoadCell_2.begin();
@@ -74,7 +74,7 @@ void setup() {
     // Setup do sensor de peso realizado
     // Setup do LoRA
     LoRa.setPins(NSS, Reset, DIO); // Declaro onde os pinos estão localizados
-    LoRA.begin(868E6); // Começo o LoRa e defino sua frequência
+    LoRa.begin(868E6); // Começo o LoRa e defino sua frequência
 
   }
 
@@ -98,17 +98,14 @@ void loop(){
     float Distance = (a + b + c)/3; // pega os valores de distancias observados e realiza a média
 
     float Height = Distance - 2.15; // troca o referêncial o valor 2,15 é a altura do teto até essa lixeira
-    sendMessage(); // chama a função que irá enviar esses dados
-    delay(5000); // delay de 5s
+    // chama a função que irá enviar esses dados
+      LoRa.beginPacket();                   // Inicia o pacote da mensagem
+      LoRa.write(Destination);              // Adiciona o endereco de destino
+      LoRa.write(LocalAddress);             // Adiciona o endereco do remetente
+      LoRa.print(Weight);                   // Vetor da mensagem do valor do peso encontrado
+      LoRa.print(Height);                   // Vetor da mensagem do valor da altura
+      LoRa.endPacket();                     // Finaliza o pacote e envia
+        delay(5000); // delay de 5s
 
 
-}
-void sendMessage() 
-{
-  LoRa.beginPacket();                   // Inicia o pacote da mensagem
-  LoRa.write(destination);              // Adiciona o endereco de destino
-  LoRa.write(localAddress);             // Adiciona o endereco do remetente
-  LoRa.print(Weight);                   // Vetor da mensagem do valor do peso encontrado
-  LoRA.print(Height);                   // Vetor da mensagem do valor da altura
-  LoRa.endPacket();                     // Finaliza o pacote e envia
 }
