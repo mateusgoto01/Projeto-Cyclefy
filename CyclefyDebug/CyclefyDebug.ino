@@ -1,8 +1,6 @@
 #include <HX711_ADC.h>
 #include <NewPing.h>
-#include <RHReliableDatagram.h>
-#include <RH_RF95.h>
-#include <SPI.h> // Não é usado realmente no codigo. Mas, é necessário para o LoRa funcionar
+#include <LoRa.h>
 
 // pins para os HX711
 const int HX711_sck_1 = 3;
@@ -30,14 +28,17 @@ NewPing sonar1(PING_PIN1, PING_PIN1, MAX_DISTANCE); //define o pino de echo, tri
 NewPing sonar2(PING_PIN1, PING_PIN1, MAX_DISTANCE);
 NewPing sonar3(PING_PIN1, PING_PIN1, MAX_DISTANCE);
 // Fim do setup dos ultrassônicos
-// Setup do LoRa transmissor
-#define SERVER_ADDRESS 1 // Endereço do servidor 
-#define CLIENT_ADDRESS 2 // mudar conforme as lixeiras forem aumentando. Não use 1, esse é do servidor
-RH_RF95 driver;
-RHReliableDatagram manager(driver, CLIENT_ADDRESS);
+// Setup do modulo LoRA
+const int NSS = A5; // define o pin do Chip Select
+const int Reset = A6; // define o pin do reset
+const int DIO = A1; // define o pin DIO1
 
-
+byte LocalAddress = 0xBB; // endereço do dispositivo LoRa, por enquanto um genérico
+byte Destination = 0xFF; // endereço do dispositivo que irá receber as informações 0xFF envia para todos ao seu alcance
+// Fim do setup do módulo LoRA
 void setup() {
+    Serial.begin(96000);
+    Serial.println("Iniciando...");
     // Setup do sensor de peso
     float calibrationValue_1; // variavel float para armazenar o valor de calibração do HX711 1
     float calibrationValue_2; // variavel float para armazenar o valor de calibração do HX711 2
@@ -67,15 +68,16 @@ void setup() {
     if (!loadcell_2_rdy) loadcell_2_rdy = LoadCell_2.startMultiple(stabilizingtime, _tare);
     if (!loadcell_3_rdy) loadcell_3_rdy = LoadCell_3.startMultiple(stabilizingtime, _tare);
     if (!loadcell_4_rdy) loadcell_4_rdy = LoadCell_4.startMultiple(stabilizingtime, _tare);
+    Serial.println("Celulas de cargas iniciadas");
 
     LoadCell_1.setCalFactor(calibrationValue_1); // usa o valor de calibração para calibrar cada HX711
     LoadCell_2.setCalFactor(calibrationValue_2);
     LoadCell_3.setCalFactor(calibrationValue_3);
     LoadCell_4.setCalFactor(calibrationValue_4);
-    
-    // Setup do LoRa
-    manager.init();
-    driver.setFrequency(868);
+    // Setup do sensor de peso realizado
+    // Setup do LoRA
+    LoRa.setPins(NSS, Reset, DIO); // Declaro onde os pinos estão localizados
+    LoRa.begin(868E6); // Começo o LoRa e defino sua frequência
 
   }
 
@@ -83,26 +85,32 @@ void setup() {
 }
 void loop(){
     // Coleta os datados do sensores de peso
-    uint8_t x = LoadCell_1.getData();
-    uint8_t y = LoadCell_2.getData();
-    uint8_t z = LoadCell_3.getData();
-    uint8_t w = LoadCell_4.getData();
+    float x = LoadCell_1.getData();
+    float y = LoadCell_2.getData();
+    float z = LoadCell_3.getData();
+    float w = LoadCell_4.getData();
 
-    uint8_t Weight = x + y + z + w - 100; //realiza a soma dos pesos e desconsidera 100kg que é o peso aproximado da lixeira
-
+    float Weight = x + y + z + w - 100; //realiza a soma dos pesos e desconsidera 100kg que é o peso aproximado da lixeira
+    Serial.print("O peso é: "); Serial.println(Weight);
     // Coleta de dados dos sensores de distância
 
-    uint8_t a = sonar1.ping_cm();
-    uint8_t b = sonar2.ping_cm();
-    uint8_t c = sonar3.ping_cm();
+    float a = sonar1.ping_cm();
+    float b = sonar2.ping_cm();
+    float c = sonar3.ping_cm();
 
-    uint8_t Distance = (a + b + c)/3; // pega os valores de distancias observados e realiza a média
-
-    uint8_t Height = Distance - 2.15; // troca o referêncial o valor 2,15 é a altura do teto até essa lixeira
+    float Distance = (a + b + c)/3; // pega os valores de distancias observados e realiza a média
+    Serial.print("A distância é: "); Serial.println(Distance);
+    float Height = Distance - 2.15; // troca o referêncial o valor 2,15 é a altura do teto até essa lixeira
+    Serial.print("A altura é: "); Serial.println(Height);
     // chama a função que irá enviar esses dados
-    manager.sendtoWait(Weight, sizeof(Weight), SERVER_ADDRESS ); // manda o valor do peso em kg
-    delay(10); // evita mandar mensagem encima de mensagem
-    manager.sendtoWait(Weight, sizeof(Weight), SERVER_ADDRESS ); // manda o valor da altura em cm
-    delay(5000); // 5 segundos até a proxima atualização
+      LoRa.beginPacket();                   // Inicia o pacote da mensagem
+      LoRa.write(Destination);              // Adiciona o endereco de destino
+      LoRa.write(LocalAddress);             // Adiciona o endereco do remetente
+      LoRa.print(Weight);                   // Vetor da mensagem do valor do peso encontrado
+      LoRa.print(Height);                   // Vetor da mensagem do valor da altura
+      LoRa.endPacket();                     // Finaliza o pacote e envia
+      Serial.println("Mensagem enviada");
+        delay(5000); // delay de 5s
+
 
 }
