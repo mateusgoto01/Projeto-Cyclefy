@@ -2,8 +2,8 @@
 #include <RH_RF95.h>
 #include <SPI.h>
 
-#define CLIENT_ADDRESS 1
-#define SERVER_ADDRESS 2
+#define CLIENT_ADDRESS 2
+#define SERVER_ADDRESS 1
 
 // Singleton instance of the radio driver
 RH_RF95 driver;

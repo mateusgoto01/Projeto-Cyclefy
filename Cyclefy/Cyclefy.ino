@@ -83,26 +83,29 @@ void setup() {
 }
 void loop(){
     // Coleta os datados do sensores de peso
-    uint8_t x = LoadCell_1.getData();
-    uint8_t y = LoadCell_2.getData();
-    uint8_t z = LoadCell_3.getData();
-    uint8_t w = LoadCell_4.getData();
+    float x = LoadCell_1.getData();
+    float y = LoadCell_2.getData();
+    float z = LoadCell_3.getData();
+    float w = LoadCell_4.getData();
 
-    uint8_t Weight = x + y + z + w - 100; //realiza a soma dos pesos e desconsidera 100kg que é o peso aproximado da lixeira
+    float Weight = x + y + z + w - 100; //realiza a soma dos pesos e desconsidera 100kg que é o peso aproximado da lixeira
 
     // Coleta de dados dos sensores de distância
 
-    uint8_t a = sonar1.ping_cm();
-    uint8_t b = sonar2.ping_cm();
-    uint8_t c = sonar3.ping_cm();
+    float a = sonar1.ping_cm();
+    float b = sonar2.ping_cm();
+    float c = sonar3.ping_cm();
 
-    uint8_t Distance = (a + b + c)/3; // pega os valores de distancias observados e realiza a média
+    float Distance = (a + b + c)/3; // pega os valores de distancias observados e realiza a média
 
-    uint8_t Height = Distance - 2.15; // troca o referêncial o valor 2,15 é a altura do teto até essa lixeira
+    float Height = Distance - 2.15; // troca o referêncial o valor 2,15 é a altura do teto até essa lixeira
     // chama a função que irá enviar esses dados
-    manager.sendtoWait(Weight, sizeof(Weight), SERVER_ADDRESS ); // manda o valor do peso em kg
-    delay(10); // evita mandar mensagem encima de mensagem
-    manager.sendtoWait(Weight, sizeof(Weight), SERVER_ADDRESS ); // manda o valor da altura em cm
+    String data_string = "";
+    data_string+= String(Weight) + "$" + String(Height);
+    char char_data[] = data_string.c_srt();
+
+    manager.sendtoWait(&char_data, sizeof(char_data), SERVER_ADDRESS); // informa que o dado é o peso
+   
     delay(5000); // 5 segundos até a proxima atualização
 
 }
