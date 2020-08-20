@@ -102,7 +102,7 @@ void loop(){
     // chama a função que irá enviar esses dados
     String data_string = "";
     data_string+= String(Weight) + "$" + String(Height);
-    char char_data[] = data_string.c_srt();
+    char char_data[] = data_string.c_str();
 
     manager.sendtoWait(&char_data, sizeof(char_data), SERVER_ADDRESS); // informa que o dado é o peso
    

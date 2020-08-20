@@ -12,8 +12,7 @@ RH_RF95 driver;
 // Class to manage message delivery and receipt, using the driver declared above
 RHReliableDatagram manager(driver, CLIENT_ADDRESS);
 
-float peso = 10.5;
-float altura = 5.25;
+
 
 
 void setup() 
@@ -34,11 +33,12 @@ void setup()
 
 void loop()
 {
+  float peso = 10.5;
+  float altura = 5.25;
   String data_string = "";
-    data_string+= String(peso) + "$" + String(altura);
-    char char_data[] = data_string.c_srt();
-
-    manager.sendtoWait(&char_data, sizeof(char_data), SERVER_ADDRESS); // informa que o dado é o peso
+  uint8_t* char_data = (uint8_t *)data_string.c_str();
+  manager.sendtoWait(char_data, sizeof(char_data), SERVER_ADDRESS);
+  Serial.println("Mensagem enviada");
    
-    delay(5000); // 5 segundos até a proxima atualização
+  delay(5000); // 5 segundos até a proxima atualização
 }

@@ -8,8 +8,6 @@ def on_recv(payload): # Define a recepção dos dados
         firebase.put("Peso: ", datalist[0], "Kg")
         firebase.put("Altura: ", datalist[1], "cm")
 
-
-
     if payload.heard_from = 3: # Se a lixeira 2 comunicar
         print("From:", payload.header_from)
         print("Received:", payload.message)
@@ -22,4 +20,8 @@ def on_recv(payload): # Define a recepção dos dados
 
 
 lora = LoRa(0, 17, 1, modem_config=ModemConfig.Bw125Cr45Sf128, tx_power=14, acks=True)
+firebase = firebase.FirebaseApplication('https://cyclefy-5f768.firebaseio.com', None)
 lora.on_recv = on_recv
+lora.set_mode_rx()
+
+lora.close()
