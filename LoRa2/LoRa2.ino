@@ -27,13 +27,14 @@ void setup()
   if (!manager.init())
     Serial.println("init failed");
     driver.setFrequency(868);
+    driver.setModemConfig(RH_RF95::Bw31_25Cr48Sf512);
 
 }
 
 
 void loop()
 {
-  float peso = 300.5125;
+  float peso = 350.8425;
   float altura = 3.7125;
 
   String data_string = String(peso) + "$" + String(altura);
