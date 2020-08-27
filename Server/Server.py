@@ -20,25 +20,25 @@ def on_recv(payload):
         dados = bytes(payload.message).decode("utf-8")
         print(dados)
         data_list = [str(data) for data in dados.split('$')]
-        print("Peso: ", data_list[0])
-        print("Altura: ", data_list[1][:-1])
+        print("Peso: ", data_list[1])
+        print("Altura: ", data_list[2])
         
-        db.child("lixeira 1").child("Peso:").set(data_list[0])
-        db.child("lixeira 1").child("Altura:").set(data_list[1][:-1])
+        db.child("lixeira 1").child("Peso:").set(data_list[1])
+        db.child("lixeira 1").child("Altura:").set(data_list[2])
     if payload.header_from == 3:
         print("From: ", payload.header_from)
         print("Received: ", payload.message)
         dados = bytes(payload.message).decode("utf-8")
         print(dados)
         data_list = [str(data) for data in dados.split('$')]
-        print("Peso: ", data_list[0][:-1])
-        print("Altura: ", data_list[1])
-        db.child("lixeira 2").child("Peso:").set(data_list[0])
-        db.child("lixeira 2").child("Altura:").set(data_list[1][:-1])
+        print("Peso: ", data_list[1])
+        print("Altura: ", data_list[2])
+        db.child("lixeira 2").child("Peso:").set(data_list[1])
+        db.child("lixeira 2").child("Altura:").set(data_list[2])
 
 
 
-lora = LoRa(0, 17, 1, freq=868, modem_config=ModemConfig.Bw125Cr45Sf128, tx_power=14, acks=True)
+lora = LoRa(0, 17, 1, freq=868, modem_config=ModemConfig.Bw31_25Cr48Sf512, tx_power=14, acks=True)
 
 print("iniciando...")
 lora.on_recv = on_recv

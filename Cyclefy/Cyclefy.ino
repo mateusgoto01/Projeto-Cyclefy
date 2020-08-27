@@ -5,14 +5,14 @@
 #include <SPI.h> // Não é usado realmente no codigo. Mas, é necessário para o LoRa funcionar
 
 // pins para os HX711
-const int HX711_sck_1 = 3;
-const int HX711_dout_1 = 4;
-const int HX711_sck_2 = 5;
-const int HX711_dout_2 = 6;
-const int HX711_sck_3 = 7;
-const int HX711_dout_3 = 8;
-const int HX711_sck_4 = 9;
-const int HX711_dout_4 = 10;
+const int HX711_sck_1 = 0;
+const int HX711_dout_1 = 1;
+const int HX711_sck_2 = 3;
+const int HX711_dout_2 = 4;
+const int HX711_sck_3 = 5;
+const int HX711_dout_3 = 6;
+const int HX711_sck_4 = 7;
+const int HX711_dout_4 = 8;
 
 HX711_ADC LoadCell_1(HX711_dout_1, HX711_sck_1); //HX711 1
 HX711_ADC LoadCell_2(HX711_dout_2, HX711_sck_2); //HX711 2
@@ -76,6 +76,7 @@ void setup() {
     // Setup do LoRa
     manager.init();
     driver.setFrequency(868);
+    driver.setModemConfig(RH_RF95::Bw31_25Cr48Sf512);
 
   }
 
@@ -88,7 +89,7 @@ void loop(){
     float z = LoadCell_3.getData();
     float w = LoadCell_4.getData();
 
-    float Weight = x + y + z + w - 100; //realiza a soma dos pesos e desconsidera 100kg que é o peso aproximado da lixeira
+    float Weight = x + y + z + w ; //realiza a soma dos pesos e desconsidera 100kg que é o peso aproximado da lixeira
 
     // Coleta de dados dos sensores de distância
 
@@ -96,13 +97,13 @@ void loop(){
     float b = sonar2.ping_cm();
     float c = sonar3.ping_cm();
 
-    float Distance = (a + b + c)/3; // pega os valores de distancias observados e realiza a média
+    float Distance = (a + b + c); // pega os valores de distancias observados e realiza a média
 
     float Height = Distance - 2.15; // troca o referêncial o valor 2,15 é a altura do teto até essa lixeira
     // a função que irá enviar esses dados
-    String data_string = String(Weight) + "$" + String(Height);
-    char data[12];
-    data_string.toCharArray(data, 12);
+    String data_string ="&" + String(Weight) + "$" + String(Height) + "$";
+    char data[14];
+    data_string.toCharArray(data, 14);
     manager.sendtoWait((uint8_t *)data, sizeof(data), SERVER_ADDRESS);
     manager.waitPacketSent();
     delay(1000); // 1 segundos até a proxima atualização
