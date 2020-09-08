@@ -23,8 +23,8 @@ def on_recv(payload):
         print("Peso: ", data_list[1])
         print("Altura: ", data_list[2])
         
-        db.child("lixeira 1").child("Peso:").set(data_list[1])
-        db.child("lixeira 1").child("Altura:").set(data_list[2])
+        db.child("Condomínio 1").child("lixeira 1").child("Peso:").set(data_list[1])
+        db.child("Condomínio 1").child("lixeira 1").child("Altura:").set(data_list[2])
     if payload.header_from == 3:
         print("From: ", payload.header_from)
         print("Received: ", payload.message)
@@ -33,8 +33,8 @@ def on_recv(payload):
         data_list = [str(data) for data in dados.split('$')]
         print("Peso: ", data_list[1])
         print("Altura: ", data_list[2])
-        db.child("lixeira 2").child("Peso:").set(data_list[1])
-        db.child("lixeira 2").child("Altura:").set(data_list[2])
+        db.child("Condomínio 1").child("lixeira 2").child("Peso:").set(data_list[1])
+        db.child("Condomínio 1").child("lixeira 2").child("Altura:").set(data_list[2])
 
 
 

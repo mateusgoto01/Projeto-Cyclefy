@@ -1,4 +1,44 @@
-
 {
-        "informat"
+    "information":{
+        "Nome do Condominio": "Condominio Potato",
+        "Lixeiras":[
+            {
+                "Nome": "Lixeira 1",
+                "ID": 2,
+                "Dados": {
+                    "Forma Geometrica": "Cilindrica",
+                    "Raio": 0.50,
+                    "Altura ate o Teto": 2.00,
+                    "Peso da Lixeira Vazia": 100,
+                    "n# Sensores": 2
+                }
+            },
+            {
+                "Nome": "Lixeira 2",
+                "ID":3,
+                "Dados": {
+                    "Forma Geometrica": "Tronco de Piramide",
+                    "Altura do Recipiente": 0.3,
+                    "Area da Base Menor": 50,
+                    "Area da Base Maior": 100,
+                    "Altura ate o Teto": 2.00,
+                    "Peso da Lixeira Vazia": 100,
+                    "n# Sensores": 3
+                }
+            },
+            {
+                "Nome": "Lixeira 3",
+                "ID":4,
+                "Dados": {
+                    "Forma Geometrica": "Paralelogramo",
+                    "Altura do Recipiente": 0.2,
+                    "Area da Base": 50,
+                    "Altura ate o Teto": 2.00,
+                    "Peso da Lixeira Vazia": 100,
+                    "n# Sensores": 3
+                }
+            }
+        ]
+     }
+
 }

@@ -55,7 +55,7 @@ void setup() {
     LoadCell_4.begin();
 
     long stabilizingtime = 2000;
-    boolean _tare = true;
+    boolean _tare = false;
 
     byte loadcell_1_rdy = 0;
     byte loadcell_2_rdy = 0;
@@ -94,18 +94,17 @@ void loop(){
     // Coleta de dados dos sensores de distância
 
     float a = sonar1.ping_cm();
-    float b = sonar2.ping_cm();
+    float b = sonar2.ping_cm(); 
     float c = sonar3.ping_cm();
 
-    float Distance = (a + b + c); // pega os valores de distancias observados e realiza a média
+    float Distance = (a + b + c)/100; // pega os valores de distancias observados e troca unidade de cm para m
 
-    float Height = Distance - 2.15; // troca o referêncial o valor 2,15 é a altura do teto até essa lixeira
+    float Height = 2.15 - Distance; // troca o referêncial o valor 2,15 é a altura do teto até essa lixeira
     // a função que irá enviar esses dados
-    String data_string ="&" + String(Weight) + "$" + String(Height) + "$";
-    char data[14];
-    data_string.toCharArray(data, 14);
-    manager.sendtoWait((uint8_t *)data, sizeof(data), SERVER_ADDRESS);
-    manager.waitPacketSent();
+    String data_string ="&" + String(Weight) + "$" + String(Height) + "$"; //Coloca os dados captados em uma String
+    char data[14]; // Variavel char de 14 
+    data_string.toCharArray(data, 14); // transforma a String em um Char
+    manager.sendtoWait((uint8_t *)data, sizeof(data), SERVER_ADDRESS); // Envia a mensagem para o endereço do servidor
+    manager.waitPacketSent(); // Espera o envio completo do pacote da mensagem
     delay(1000); // 1 segundos até a proxima atualização
-
 }
