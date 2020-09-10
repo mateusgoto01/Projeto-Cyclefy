@@ -2,6 +2,8 @@ import json
 import math
 from raspi_lora import LoRa, ModemConfig
 import pyrebase
+ 
+    
 
 def read_settings():
 
@@ -34,47 +36,53 @@ def cilindrica_volume(data):
 
     altura_teto = data['Altura ate o Teto']
     raio = data['Raio']
-    media = parsed_data[2]/data['n# Sensores']
+    media = data['n# Sensores']
+    converse = float(parsed_data[2])
+    altura = converse/media
 
     # calculate the fraking volume here
-    return (2*math.pi*raio**2)*(altura_teto - media)
+    return (2*math.pi*raio**2)*(altura_teto - altura)
 
 def tronco_piramide_volume(data):
 
     altura_teto = data['Altura ate o Teto']
     area_menor = data['Area da Base Menor']
     area_maior = data['Area da Base Maior']
-    media = parsed_data[2]/data['n# Sensores']
+    converse = float(parsed_data[2])
+    altura = converse/media
     
-    return ((altura_teto - media)/3) * (area_maior + (math.sqrt(area_maior*area_menor) + area_menor))
+    return ((altura_teto - altura)/3) * (area_maior + (math.sqrt(area_maior*area_menor) + area_menor))
 
 def paralelogramo_volume(data):
 
     altura_teto = data['Altura ate o Teto']
     area = data['Area da Base']
-    media = parsed_data[2]/data['n# Sensores']
+    media = data['n# Sensores']
+    converse = float(parsed_data[2])
+    altura = converse/media
 
-    return area*(altura_teto - media)
-
-
+    return area*(altura_teto - altura)
 
 def on_recv(payload):
 
-    # Get the id form the sender form the payload 
+    # Get the id from the sender form the payload 
     sender_id = payload.header_from
+
+    parsed_data = parse_payload(payload)
+ 
 
     print("From: ", payload.header_from)
     print("Received: ", payload.message)
-    dados = bytes(payload.message).decode("utf-8")
-    print(dados)
-    parsed_data = [str(data) for data in dados.split('$')]
-    print("Peso: ", parsed_list[1])
-    print("Altura: ", parsed_list[2])
+    
+    print("Peso: ", parsed_data[1])
+    print("Altura: ", parsed_data[2])
 
     # Read the json file to get a list of all trash cans and the name of the condomínio
     settings = read_settings()
     trash_cans = settings['information']['Lixeiras'] # ! Não é a melhor forma
-    condominio = settings['information']['Nome do Condomínio']
+    condominio = settings['information']['Nome do Condominio']
+    tare = settings['Peso da Lixeira Vazia']
+    peso = float(parsed_data[1]) - tare
 
     # Since we have a list with all the cans in the system and their respective IDs and Names
     # we can get the name of the one that send the message via LoRa 
@@ -85,17 +93,26 @@ def on_recv(payload):
             settings_data = read_settings()
             lixeiras = settings_data['information']['Lixeiras']
             lixeiras = [ {'ID': lixeira['ID'], 'Forma Geometrica': lixeira['Dados']['Forma Geometrica'], 'Dados': lixeira['Dados']} for lixeira in lixeiras if lixeira['ID'] == target_can_id]
-            tare = data["Peso da Lixeira Vazia"]
             print (json.dumps(lixeiras, indent=4))
 
-            for lixeira in lixeiras:
-            print(calculate_volume(lixeira['Forma Geometrica'], lixeira['Dados']))
-            
-
-            db.child(condominio).child(sender_name).child('Peso').set(parsed_data[1] - tare)
+            db.child(condominio).child(sender_name).child('Peso').set(peso)
             db.child(condominio).child(sender_name).child('Volume').set(lixeiras)
+config = {
+  "apiKey": "AIzaSyCWH1RjnADOMq_vjOJmelWc0uYOPZ8AX_0",
+  "authDomain": "cyclefy-5f768.firebaseapp.com",
+  "databaseURL": "https://cyclefy-5f768.firebaseio.com",
+  "storageBucket": "cyclefy-5f768.appspot.com"
+}
 
-    
+firebase = pyrebase.initialize_app(config)
+db = firebase.database()
+
+lora = LoRa(0, 17, 1, freq=868, modem_config=ModemConfig.Bw31_25Cr48Sf512, tx_power=14, acks=True)
+
+print("iniciando...")
+lora.on_recv = on_recv
+lora.set_mode_rx()
+print("Finalizado")    
 
 
 

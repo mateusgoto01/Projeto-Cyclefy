@@ -2,7 +2,7 @@
 #include <RH_RF95.h>
 #include <SPI.h>
 
-#define CLIENT_ADDRESS 3
+#define CLIENT_ADDRESS 2
 #define SERVER_ADDRESS 1
 
 // Singleton instance of the radio driver
@@ -35,7 +35,7 @@ void setup()
 void loop()
 {
   float peso = 187.8475;
-  float altura = 1.7691;
+  float altura = 3;
 
   String data_string = "$" + String(peso) + "$" + String(altura) + "$";
   char data[14];
