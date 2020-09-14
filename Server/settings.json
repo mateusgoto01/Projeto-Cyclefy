@@ -1,41 +1,42 @@
 {
     "information":{
-        "Nome do Condominio": "Condominio Potato",
+        "Nome do Condominio": "Condominio Exemplo", // Informe entre "" o nome do condomínio sem usar acentos
         "Lixeiras":[
             {
-                "Nome": "Lixeira 1",
-                "ID": 2,
+                "Nome": "Lixeira 1", // Declare o nome da lixeira entre ""
+                "ID": 2, // A ID das lixiras tem que ser um numero entre 2 e 254
                 "Dados": {
-                    "Forma Geometrica": "Cilindrica",
-                    "Raio": 0.50,
-                    "Altura ate o Teto": 2.00,
-                    "Peso da Lixeira Vazia": 100,
-                    "n# Sensores": 2
+                    "Forma Geometrica": "Cilindrica", // Ao declara a forma o nome entre "" tem que ser EXATAMENTE como está nesses exemplos
+                    "Raio": 0.50, // unidade em Metros
+                    "Altura ate o Teto": 2.00, // unidade em Metros
+                    "Peso da Lixeira Vazia": 100, // unidade em Quilogramas
+                    "n# Sensores": 2 // Quantidade de sensores
                 }
             },
             {
-                "Nome": "Lixeira 2",
-                "ID":3,
+                "Nome": "Lixeira 2", // Declare o nome da lixeira entre ""
+                "ID": 3, // A ID das lixiras tem que ser um numero entre 2 e 254
                 "Dados": {
-                    "Forma Geometrica": "Tronco de Piramide",
-                    "Altura do Recipiente": 0.3,
-                    "Area da Base Menor": 50,
-                    "Area da Base Maior": 100,
-                    "Altura ate o Teto": 2.00,
-                    "Peso da Lixeira Vazia": 100,
-                    "n# Sensores": 3
+                    "Forma Geometrica": "Tronco de Piramide", // Ao declara a forma o nome entre "" tem que ser EXATAMENTE como está nesses exemplos
+                    "Comprimento da Base Menor": 0.50, // unidade em Metros
+                    "Largura da Base Menor": 0.50, // unidade em Metros
+                    "Comprimento da Base Maior": 1.00, // unidade em Metros
+                    "Largura da Base Maior": 1.00, // unidade em Metros
+                    "Altura ate o Teto": 2.00, // unidade em Metros
+                    "Peso da Lixeira Vazia": 100, // unidade em Quilogramas
+                    "n# Sensores": 3 // Quantidade de sensores
                 }
             },
             {
-                "Nome": "Lixeira 3",
-                "ID":4,
+                "Nome": "Lixeira 3", // Declare o nome da lixeira entre ""
+                "ID": 4, // A ID das lixiras tem que ser um numero entre 2 e 254
                 "Dados": {
-                    "Forma Geometrica": "Paralelogramo",
-                    "Altura do Recipiente": 0.2,
-                    "Area da Base": 50,
-                    "Altura ate o Teto": 2.00,
-                    "Peso da Lixeira Vazia": 100,
-                    "n# Sensores": 3
+                    "Forma Geometrica": "Paralelogramo", // Ao declara a forma o nome entre "" tem que ser EXATAMENTE como está nesses exemplos
+                    "Comprimento da Base": 0.50, // unidade em Metros
+                    "Largura da Base": 0.50, // unidade em Metros
+                    "Altura ate o Teto": 2.00, // unidade em Metros
+                    "Peso da Lixeira Vazia": 100, // unidade em Quilogramas
+                    "n# Sensores": 3 // Quantidade de sensores
                 }
             }
         ]
